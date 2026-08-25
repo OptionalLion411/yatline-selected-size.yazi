@@ -19,8 +19,8 @@ local function setup(st)
 			if not current_state.file_data then current_state.file_data = {} end
 
 			local new_selection = {}
-			for _, url in pairs(cx.active.selected) do
-				new_selection[tostring(url)] = true
+			for _, file in pairs(cx.active.selected) do
+				new_selection[tostring(file.url)] = true
 			end
 
 			if not next(new_selection) then
