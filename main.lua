@@ -14,9 +14,22 @@ end)
 
 local function setup(st)
 	if Yatline ~= nil then
-		Yatline.coloreds.get["selected-files-size"] = function()
+		Yatline.string.get["selected-files-size"] = function(_, show_file_count, show_hovered_size)
+			show_file_count = show_file_count ~= false
+			show_hovered_size = show_hovered_size == true
 			local current_state = state()
 			if not current_state.file_data then current_state.file_data = {} end
+			current_state.show_count = show_file_count
+
+			local function hovered_size_text_or_nil()
+				if show_hovered_size then
+					local hovered = cx.active.current.hovered
+					if hovered then
+						return string.format(" %s ", Yatline.string.get:hovered_size())
+					end
+				end
+				return nil
+			end
 
 			local new_selection = {}
 			for _, file in pairs(cx.active.selected) do
@@ -27,7 +40,7 @@ local function setup(st)
 				for path in pairs(current_state.file_data) do
 					remove_file_data(path)
 				end
-				return nil
+				return hovered_size_text_or_nil()
 			end
 
 			for path in pairs(current_state.file_data) do
@@ -42,22 +55,29 @@ local function setup(st)
 				end
 			end
 
-			local total_size, total_count, has_directory = 0, 0, false
+			local total_size, total_count, has_directory, is_loading = 0, 0, false, false
 			for _, data in pairs(current_state.file_data) do
 				if data then  -- false = still loading, skip
 					total_size = total_size + data.size
 					total_count = total_count + data.count
 					if data.is_dir then has_directory = true end
+				else
+					is_loading = true
 				end
 			end
 
-			if total_size == 0 then return {} end
+      -- prevents short disapearance of the component while loading
+			if is_loading then
+				return hovered_size_text_or_nil()
+			end
+
+			if total_size == 0 then return "" end
 
 			local size_str = ya.readable_size(total_size)
-			local text = has_directory
+			local text = show_file_count and has_directory
 				and string.format(" %d files, %s ", total_count, size_str)
 				or string.format(" %s ", size_str)
-			return { { text, "blue" } }
+			return text
 		end
 	end
 end
@@ -74,15 +94,17 @@ local function entry(st, job)
 
 	local count, is_dir = 1, false
 
-	local cha = fs.cha(Url(file_path))
-	if cha and cha.is_dir then
-		is_dir = true
-		local count_output = Command("sh")
-			:arg("-c")
-			:arg(string.format("find %s -type f 2>/dev/null | wc -l", ya.quote(file_path, true)))
-			:output()
-		if count_output and count_output.status.success then
-			count = tonumber(count_output.stdout:match("%d+")) or 0
+	if st.show_count ~= false then
+		local cha = fs.cha(Url(file_path))
+		if cha and cha.is_dir then
+			is_dir = true
+			local count_output = Command("sh")
+				:arg("-c")
+				:arg(string.format("find %s -type f 2>/dev/null | wc -l", ya.quote(file_path, true)))
+				:output()
+			if count_output and count_output.status.success then
+				count = tonumber(count_output.stdout:match("%d+")) or 0
+			end
 		end
 	end
 

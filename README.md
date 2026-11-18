@@ -27,8 +27,13 @@ require("yatline-selected-size"):setup()
 
 Add the component to your yatline config:
 ```lua
-{ type = "coloreds", custom = false, name = "selected-files-size" }
+{ type = "string", custom = false, name = "selected-files-size", params = { true, true } }
 ```
+
+`params` is `{ show_file_count, show_hovered_size }`:
+
+- `show_file_count` (default `true`) - also show the recursive file count of selected directories
+- `show_hovered_size` (default `false`) - show the hovered file's size (yatline's `hovered_size`) while nothing is selected or the selection is still loading
 
 ## Display
 
