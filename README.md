@@ -1,5 +1,8 @@
 # yatline-selected-size.yazi
 
+> [!NOTE]
+> This is a fork of [pakhromov/yatline-selected-size.yazi](https://github.com/pakhromov/yatline-selected-size.yazi). Many thanks to pakhromov for the codebase!
+
 A [yatline.yazi](https://github.com/imsi32/yatline.yazi) addon that shows the total size of selected files and directories. When a directory is selected, also shows the total recursive file count. Results are cached per path and update as you change the selection.
 
 https://github.com/user-attachments/assets/90c3f8f1-1f0e-4f29-9ed7-0805caa0c6d8
@@ -12,12 +15,7 @@ https://github.com/user-attachments/assets/90c3f8f1-1f0e-4f29-9ed7-0805caa0c6d8
 
 **Via ya pkg:**
 ```bash
-ya pkg add pakhromov/yatline-selected-size
-```
-
-**Manual:**
-```bash
-git clone https://github.com/pakhromov/yatline-selected-size.yazi ~/.config/yazi/plugins/yatline-selected-size.yazi
+ya pkg add OptionalLion411/yatline-selected-size
 ```
 
 Add to `~/.config/yazi/init.lua` **after** yatline's own setup:
